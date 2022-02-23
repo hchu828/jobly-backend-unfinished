@@ -35,6 +35,13 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
   return res.status(201).json({ company });
 });
 
+
+
+// TODO: get route notes
+// use a schema to validate the values being pulled from the query string
+// Need a filter helper based on sql.js in helpers folder.
+
+
 /** GET /  =>
  *   { companies: [ { handle, name, description, numEmployees, logoUrl }, ...] }
  *
@@ -47,8 +54,28 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  */
 
 router.get("/", async function (req, res, next) {
+  
+  if(!req.query){
+    const companies = await Company.findAll();
+    return res.json({ companies });
+  }
+
+  if(req.query.MinEmployees>req.query.MaxEmployees){
+    throw new BadRequestError(
+      "Min Employees should be less than Max Employees filter"
+      );
+  }
+
   const companies = await Company.findAll();
+  const query = req.query
+
+  // Call the helpder passing the query values / array
+
+
   return res.json({ companies });
+
+
+ 
 });
 
 /** GET /[handle]  =>  { company }
