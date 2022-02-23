@@ -18,10 +18,10 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
 
   // {firstName: 'Aliya', age: 32} => ['"first_name"=$1', '"age"=$2']
   const cols = keys.map((colName, idx) =>
-      `"${jsToSql[colName] || colName}"=$${idx + 1}`,
+    `"${jsToSql[colName] || colName}"=$${idx + 1}`,
   );
 
-  // Returns the template / string to run in SQL
+  // Returns obj with string literals for SET clause and sanitized SQL values
   return {
     setCols: cols.join(", "),
     values: Object.values(dataToUpdate),
