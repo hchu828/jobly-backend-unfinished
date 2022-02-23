@@ -81,15 +81,15 @@ class Company {
 
     const companiesRes = await db.query(
       `SELECT handle,
-                name,
-                description,
-                num_employees AS "numEmployees",
-                logo_url AS "logoUrl"
-                FROM companies
-                WHERE ${joinedWhereString}
-           ORDER BY name`);
-
-    return companiesRes.rows;
+              name,
+              description,
+              num_employees AS "numEmployees",
+              logo_url AS "logoUrl"
+        FROM companies
+        WHERE ${joinedWhereString}
+        ORDER BY name`);
+    console.log("companiesRes:", companiesRes);
+    return companiesRes.rows[0];
   }
 
   /** Given a company handle, return data about company.

@@ -29,16 +29,19 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
 }
 
 
-function sqlForFilterByQuery(query){
-  const whereString = [];  
+function sqlForFilterByQuery(query) {
+  const whereString = [];
 
-  if(query.name){
-    whereString.push(`name = ${query.name}`)
+  if (query.name) {
+    whereString.push(`name='${query.name.toUpperCase()}'`)
   }
 
-  const joinedWhereString =  whereString.join(", ")
+  console.log("whereString:", whereString);
+
+  const joinedWhereString = whereString.join(', ');
 
 
+  console.log("joinedWhereString:", joinedWhereString);
 
   return joinedWhereString;
 
