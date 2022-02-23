@@ -126,7 +126,12 @@ describe("GET /companies", function () {
   test("doesn't work: minEmployees > maxEmployees", async function () {
     const resp = await request(app)
       .get("/companies?minEmployees=5&maxEmployees=1");
+    expect(resp.statusCode).toEqual(400);
+  })
 
+  test("doesn't work: query doesn't match schema validation", async function () {
+    const resp = await request(app)
+      .get("/companies?dinosaurs=5&pickles=1");
     expect(resp.statusCode).toEqual(400);
   })
 });

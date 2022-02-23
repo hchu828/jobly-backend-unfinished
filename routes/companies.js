@@ -3,6 +3,7 @@
 /** Routes for companies. */
 
 const jsonschema = require("jsonschema");
+const queryFilterSchema = require("../schemas/queryFilter.json");
 const express = require("express");
 
 const { BadRequestError } = require("../expressError");
@@ -36,12 +37,6 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
 });
 
 
-
-// TODO: get route notes
-// use a schema to validate the values being pulled from the query string
-// Need a filter helper based on sql.js in helpers folder.
-
-
 /** GET /  =>
  *   { companies: [ { handle, name, description, numEmployees, logoUrl }, ...] }
  *
@@ -55,6 +50,7 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
 
 router.get("/", async function (req, res, next) {
 
+
   if (Object.values(req.query).length === 0) {
     const companies = await Company.findAll();
     return res.json({ companies });
@@ -64,6 +60,14 @@ router.get("/", async function (req, res, next) {
     throw new BadRequestError(
       "Min Employees should be less than Max Employees filter"
     );
+  }
+
+  const result = jsonschema.validate(req.query, queryFilterSchema);
+
+  console.log("RESULT.VALID", result.valid)
+  if (!result.valid) {
+    let errors = result.errors.map(err => err.stack);
+    throw new BadRequestError(errors);
   }
 
   const companies = await Company.filterByQuery(req.query);

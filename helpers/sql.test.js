@@ -42,6 +42,13 @@ describe("sqlForFilterByQuery", function () {
     expect(res).toEqual("name ILIKE '%C1%'");
   });
 
+  test("works: min-employees query", function () {
+    const query = { minEmployees: 3 };
+
+    const res = sqlForFilterByQuery(query);
+    expect(res).toEqual("num_employees >= 3'");
+  });
+
   test("works: multi-key query", function () {
     const query = { name: "C", minEmployees: 3, maxEmployees: 3 };
 
