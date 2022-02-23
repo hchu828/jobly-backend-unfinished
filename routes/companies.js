@@ -66,8 +66,7 @@ router.get("/", async function (req, res, next) {
     );
   }
 
-  const companies = await Company.filterByQuery();
-  const query = req.query
+  const companies = await Company.filterByQuery(req.query);
 
   // Call the helpder passing the query values / array
 

@@ -28,4 +28,20 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
   };
 }
 
-module.exports = { sqlForPartialUpdate };
+
+function sqlForFilterByQuery(query){
+  const whereString = [];  
+
+  if(query.name){
+    whereString.push(`name = ${query.name}`)
+  }
+
+  const joinedWhereString =  whereString.join(", ")
+
+
+
+  return joinedWhereString;
+
+}
+
+module.exports = { sqlForPartialUpdate, sqlForFilterByQuery };
