@@ -114,7 +114,7 @@ describe("get", function () {
 describe("filterByQuery", function () {
   test("works: filter by name", async function () {
     let company = await Company.filterByQuery({ name: "c1" });
-    expect(company).toEqual({
+    expect(company[0]).toEqual({
       handle: "c1",
       name: "C1",
       description: "Desc1",
@@ -125,9 +125,10 @@ describe("filterByQuery", function () {
 
   test("not found if no such company", async function () {
     try {
-      await Company.filterByQuery("nope");
+      await Company.filterByQuery({name:"pickle"});
       fail();
     } catch (err) {
+      console.log("ERROR:",err)
       expect(err instanceof NotFoundError).toBeTruthy();
     }
   });

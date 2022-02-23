@@ -33,7 +33,7 @@ function sqlForFilterByQuery(query) {
   const whereString = [];
 
   if (query.name) {
-    whereString.push(`name='${query.name.toUpperCase()}'`)
+    whereString.push(`name ILIKE '%${query.name}%'`)
   }
 
   console.log("whereString:", whereString);

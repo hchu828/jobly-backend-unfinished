@@ -1,7 +1,7 @@
 "use strict";
 
 const { BadRequestError } = require("../expressError");
-const { sqlForPartialUpdate } = require("./sql");
+const { sqlForPartialUpdate, sqlForFilterByQuery } = require("./sql");
 
 describe("sqlForPartialUpdate", function () {
   test("works", function () {
@@ -30,5 +30,15 @@ describe("sqlForPartialUpdate", function () {
     catch (err) {
       expect(err instanceof BadRequestError).toBeTruthy();
     }
+  });
+});
+
+
+describe("sqlForFilterByQuery", function () {
+  test("works", function () {
+    const data = { name: "C1" };
+
+    const res = sqlForFilterByQuery(data);
+    expect(res).toEqual("name ILIKE '%C1%'");
   });
 });
