@@ -109,7 +109,7 @@ describe("GET /companies", function () {
 
   test("works: filters name", async function () {
     const resp = await request(app)
-      .get("/companies?name=C1")
+      .get("/companies?name=C1");
 
     expect(resp.body).toEqual({
       companies:
@@ -122,7 +122,15 @@ describe("GET /companies", function () {
         }]
     });
   });
+
+  test("doesn't work: minEmployees > maxEmployees", async function () {
+    const resp = await request(app)
+      .get("/companies?minEmployees=5&maxEmployees=1");
+
+    expect(resp.statusCode).toEqual(400);
+  })
 });
+
 
 /************************************** GET /companies/:handle */
 
