@@ -33,12 +33,20 @@ function sqlForFilterByQuery(query) {
   const whereString = [];
 
   if (query.name) {
-    whereString.push(`name ILIKE '%${query.name}%'`)
+    whereString.push(`name ILIKE '%${query.name}%'`);
+  }
+
+  if (query.minEmployees) {
+    whereString.push(`num_employees >= ${query.minEmployees}`);
+  }
+
+  if (query.maxEmployees) {
+    whereString.push(`num_employees <= ${query.maxEmployees}`);
   }
 
   console.log("whereString:", whereString);
 
-  const joinedWhereString = whereString.join(', ');
+  const joinedWhereString = whereString.join(' AND ');
 
 
   console.log("joinedWhereString:", joinedWhereString);

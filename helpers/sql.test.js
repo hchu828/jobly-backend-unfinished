@@ -35,10 +35,19 @@ describe("sqlForPartialUpdate", function () {
 
 
 describe("sqlForFilterByQuery", function () {
-  test("works", function () {
-    const data = { name: "C1" };
+  test("works: single-key query", function () {
+    const query = { name: "C1" };
 
-    const res = sqlForFilterByQuery(data);
+    const res = sqlForFilterByQuery(query);
     expect(res).toEqual("name ILIKE '%C1%'");
+  });
+
+  test("works: multi-key query", function () {
+    const query = { name: "C", minEmployees: 3, maxEmployees: 3 };
+
+    const res = sqlForFilterByQuery(query);
+    expect(res).toEqual(
+      "name ILIKE '%C%' AND num_employees >= 3 AND num_employees <= 3"
+    );
   });
 });

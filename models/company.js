@@ -74,9 +74,6 @@ class Company {
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
   */
   static async filterByQuery(query) {
-
-
-
     const joinedWhereString = sqlForFilterByQuery(query);
 
     const companiesRes = await db.query(
