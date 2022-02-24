@@ -56,6 +56,12 @@ class Company {
    * */
 
   static async findAll(queryParams) {
+    //TODO: find a way to define whereString and values where needed
+    let { whereString, values } = (queryParams)
+      ? Company._sqlForFilterByQuery(queryParams)
+      : { undefined: undefined };
+
+
     const companiesRes = await db.query(
       `SELECT handle,
                 name,
@@ -63,8 +69,8 @@ class Company {
                 num_employees AS "numEmployees",
                 logo_url AS "logoUrl"
            FROM companies
-           ${undefined || queryParams}
-           ORDER BY name`);
+           ${whereString || undefined}
+           ORDER BY name`, (undefined || [...values]));
     return companiesRes.rows;
   }
 
@@ -74,7 +80,6 @@ class Company {
  * Returns SQL string literal for WHERE clause
  * */
   static _sqlForFilterByQuery(query) {
-
 
     if (query.minEmployees > query.maxEmployees) {
       throw new BadRequestError(
@@ -98,8 +103,9 @@ class Company {
       sqlWhereParts.push(`num_employees <= $${queryKeys.indexOf("maxEmployees") + 1}`);
     }
 
+    const whereClause = sqlWhereParts.join(' AND ');
     return {
-      sqlWhere: sqlWhereParts.join(' AND '),
+      sqlWhere: 'WHERE ' + whereClause,
       values: Object.values(query),
     };
   }

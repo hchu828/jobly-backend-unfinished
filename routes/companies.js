@@ -56,12 +56,9 @@ router.get("/", async function (req, res, next) {
     throw new BadRequestError(errors);
   }
 
-  if (Object.values(req.query).length === 0) {
-    const companies = await Company.findAll();
-    return res.json({ companies });
-  }
-
-  const companies = await Company.filterByQuery(req.query);
+  const companies = (Object.values(req.query).length === 0)
+    ? await Company.findAll()
+    : await Company.findAll(req.query);
 
   return res.json({ companies });
 });
