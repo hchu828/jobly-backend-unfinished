@@ -93,7 +93,7 @@ describe("isAdmin", function () {
   test("isAdmin doesn't work: no user logged in", function () {
     expect.assertions(1);
     const req = {};
-    const res = { locals: {} };
+    const res = { locals: {user : { isAdmin: false}} };
     const next = function (err) {
       console.log("error type:", err instanceof UnauthorizedError);
       expect(err instanceof UnauthorizedError).toBeTruthy();

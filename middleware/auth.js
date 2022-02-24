@@ -42,8 +42,14 @@ function ensureLoggedIn(req, res, next) {
   }
 }
 
+/** Middleware to use after a user has logged in and must have isAdmin : true
+ * 
+ * If not, raises Unauthorized.
+ */
+
 function isAdmin(req, res, next) {
   try {
+    console.log("isAdmin info", res.locals)
     if (res.locals.user.isAdmin !== true) throw new UnauthorizedError();
     return next();
   } catch (err) {
