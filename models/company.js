@@ -95,8 +95,7 @@ class Company {
  * if query parameter is empty
  * */
 
-  //TODO: 
-  // use { name, minEmployees, maxEmployees } as parameter
+
   static _sqlForFilterByQuery(query) {
 
     const queryVals = []

@@ -123,6 +123,22 @@ describe("GET /companies", function () {
     });
   });
 
+  test("works: filters name, min/max Employees", async function () {
+    const resp = await request(app)
+      .get("/companies?name=C3&minEmployees=1&maxEmployees=3");
+
+    expect(resp.body).toEqual({
+      companies:
+        [{
+          handle: "c3",
+          name: "C3",
+          description: "Desc3",
+          numEmployees: 3,
+          logoUrl: "http://c3.img",
+        }]
+    });
+  });
+
   test("doesn't work: minEmployees > maxEmployees", async function () {
     const resp = await request(app)
       .get("/companies?minEmployees=5&maxEmployees=1");
