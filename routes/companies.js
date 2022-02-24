@@ -49,13 +49,14 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  */
 
 router.get("/", async function (req, res, next) {
+  //TODO: type conversion here +req.minEmployees
   const result = jsonschema.validate(req.query, queryFilterSchema);
 
   if (!result.valid) {
     const errors = result.errors.map(err => err.stack);
     throw new BadRequestError(errors);
   }
-
+  //TODO: no ternary needed
   const companies = (Object.values(req.query).length === 0)
     ? await Company.findAll()
     : await Company.findAll(req.query);

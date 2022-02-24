@@ -111,10 +111,10 @@ describe("get", function () {
   });
 });
 
-//TODO: refactor
+
 describe("findAll with filter by ", function () {
   test("works: filter by name", async function () {
-    let company = await Company.findAll({name: 'c1'});
+    let company = await Company.findAll({ name: 'c1' });
     expect(company[0]).toEqual({
       handle: "c1",
       name: "C1",
@@ -131,6 +131,59 @@ describe("findAll with filter by ", function () {
     } catch (err) {
       expect(err instanceof NotFoundError).toBeTruthy();
     }
+  });
+
+  //TODO: combine all findAll tests
+
+  test("minEmployees > maxEmployees", async function () {
+    try {
+      await Company.findAll({ minEmployees: 10, maxEmployees: 1 });
+      fail();
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  });
+});
+
+describe("_sqlForFilterByQuery", function () {
+  test("works: single-key query", function () {
+    const query = { name: "C1" };
+
+    const res = Company._sqlForFilterByQuery(query);
+    expect(res).toEqual({
+      sqlWhere: "WHERE name ILIKE $1",
+      values: ['%C1%'],
+    });
+  });
+  //TODO: max-employees query
+  test("works: min-employees query", function () {
+    const query = { minEmployees: 3 };
+
+    const res = Company._sqlForFilterByQuery(query);
+    expect(res).toEqual({
+      sqlWhere: "WHERE num_employees >= $1",
+      values: [3],
+    });
+  });
+
+  test("works: multi-key query", function () {
+    const query = { name: "C", minEmployees: 3, maxEmployees: 3 };
+
+    const res = Company._sqlForFilterByQuery(query);
+    expect(res).toEqual({
+      sqlWhere: "WHERE name ILIKE $1 AND num_employees >= $2 AND num_employees <= $3",
+      values: ['%C%', 3, 3],
+    });
+  });
+
+  test("works: no query", function () {
+    const query = {};
+
+    const res = Company._sqlForFilterByQuery(query);
+    expect(res).toEqual({
+      sqlWhere: "",
+      values: [],
+    });
   });
 });
 

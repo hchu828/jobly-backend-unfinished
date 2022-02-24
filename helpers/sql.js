@@ -4,10 +4,12 @@ const { BadRequestError } = require("../expressError");
  * column headers in a SQL statement. Accepts a JS object in the second argument
  * to be converted to SQL field values corresponding to the column headers
  * 
- * Returns an object with 2 keys. setCols for column headers to be SET in the UPDATE
+ * Returns an object with 2 keys { setCols, values }
+ * setCols for column headers to be SET in the UPDATE
  * command. Values to be provided to the placeholders in the SQL statement
+ * 
  */
-//TODO: // Provide example of return { setCols, values }
+//TODO: actual example of obj { setCols: "fafjef", ..}
 function sqlForPartialUpdate(dataToUpdate, jsToSql) {
   const keys = Object.keys(dataToUpdate);
   if (keys.length === 0) throw new BadRequestError("No data");

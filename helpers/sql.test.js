@@ -33,29 +33,3 @@ describe("sqlForPartialUpdate", function () {
     }
   });
 });
-
-//TODO: refactor
-describe("sqlForFilterByQuery", function () {
-  test("works: single-key query", function () {
-    const query = { name: "C1" };
-
-    const res = sqlForFilterByQuery(query);
-    expect(res).toEqual("name ILIKE '%C1%'");
-  });
-
-  test("works: min-employees query", function () {
-    const query = { minEmployees: 3 };
-
-    const res = sqlForFilterByQuery(query);
-    expect(res).toEqual("num_employees >= 3");
-  });
-
-  test("works: multi-key query", function () {
-    const query = { name: "C", minEmployees: 3, maxEmployees: 3 };
-
-    const res = sqlForFilterByQuery(query);
-    expect(res).toEqual(
-      "name ILIKE '%C%' AND num_employees >= 3 AND num_employees <= 3"
-    );
-  });
-});

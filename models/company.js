@@ -63,14 +63,12 @@ class Company {
       );
     }
 
-    const filterResp = Company._sqlForFilterByQuery(queryParams);
-    const whereString = filterResp.sqlWhere;
-    const values = filterResp.values;
+    const { sqlWhere, values } = Company._sqlForFilterByQuery(queryParams);
+    // const whereString = filterResp.sqlWhere;
+    // const values = filterResp.values;
 
 
-    console.log("WHERE STRING MAIN", whereString);
-    console.log("VALUES MAIN", values)
-    
+
     const companiesRes = await db.query(
       `SELECT handle,
                 name,
@@ -78,21 +76,30 @@ class Company {
                 num_employees AS "numEmployees",
                 logo_url AS "logoUrl"
            FROM companies
-           ${whereString}
+           ${sqlWhere}
            ORDER BY name`,
-           values);
+      values);
+    //TODO: alternative option: return empty array
+    if (Object.keys(queryParams).length !== 0 && companiesRes.rows.length === 0) {
+      throw new NotFoundError(`No company matching filter criteria`);
+    }
+
     return companiesRes.rows;
   }
 
-  /** Accepts an object containing URL query parameters that can ONLY include
- * { name, minEmployees, maxEmployees } 
+  /** Accepts an object containing search filters that can ONLY include
+ * { name, minEmployees, maxEmployees }. 
  * 
- * Returns SQL string literal for WHERE clause
+ * Returns { sqlWhere, values } where sqlWhere is a string literal and 
+ * values is an array of query param values. Both keys have default values
+ * if query parameter is empty
  * */
+
+  //TODO: 
+  // use { name, minEmployees, maxEmployees } as parameter
   static _sqlForFilterByQuery(query) {
 
     const queryVals = []
-
     const sqlWhereParts = [];
 
     if (query.name) {
@@ -110,15 +117,9 @@ class Company {
       sqlWhereParts.push(`num_employees <= $${queryVals.length}`);
     }
 
-    // ternary: if whereparts greater than 0, do the same, otherwise, dont concat WHERE
-    // and instead return an empty string
-
     const whereClause = (sqlWhereParts.length > 0)
       ? 'WHERE ' + sqlWhereParts.join(' AND ')
       : '';
-
-    console.log("WHERE CLAUSE INTERNAL", whereClause)
-    console.log("QUERY VALS INTERNAL", queryVals)
 
     return {
       sqlWhere: whereClause,
@@ -126,33 +127,6 @@ class Company {
     };
   }
 
-  /** Find all companies by filter 
-   * 
-   * Accepts object with { filterParam1: filterParamValue, ... }
-   * 
-   * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
-  */
-  static async filterByQuery(query) {
-    let { joinedWhereString, values } = _sqlForFilterByQuery(query);
-
-    const companiesRes = await db.query(
-      `SELECT handle,
-      name,
-      description,
-      num_employees AS "numEmployees",
-      logo_url AS "logoUrl"
-      FROM companies
-      WHERE ${joinedWhereString}
-      ORDER BY name`,
-      [...values]
-    );
-
-    if (companiesRes.rows.length === 0) {
-      throw new NotFoundError(`No company matching filter criteria`);
-    }
-
-    return companiesRes.rows;
-  }
 
   /** Given a company handle, return data about company.
    *
