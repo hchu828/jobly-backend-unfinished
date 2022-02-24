@@ -44,7 +44,7 @@ function ensureLoggedIn(req, res, next) {
 
 function isAdmin(req, res, next) {
   try {
-    if (!res.locals.user.isAdmin) throw new UnauthorizedError();
+    if (res.locals.user.isAdmin !== true) throw new UnauthorizedError();
     return next();
   } catch (err) {
     return next(err);
@@ -55,4 +55,5 @@ function isAdmin(req, res, next) {
 module.exports = {
   authenticateJWT,
   ensureLoggedIn,
+  isAdmin,
 };

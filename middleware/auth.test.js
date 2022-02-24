@@ -2,9 +2,11 @@
 
 const jwt = require("jsonwebtoken");
 const { UnauthorizedError } = require("../expressError");
+
 const {
   authenticateJWT,
   ensureLoggedIn,
+  isAdmin,
 } = require("./auth");
 
 
@@ -74,5 +76,28 @@ describe("ensureLoggedIn", function () {
       expect(err instanceof UnauthorizedError).toBeTruthy();
     };
     ensureLoggedIn(req, res, next);
+  });
+});
+
+describe("isAdmin", function () {
+  test("works: user is admin", function () {
+    expect.assertions(1);
+    const req = {};
+    const res = { locals: { user: { isAdmin: true } } };
+    const next = function (err) {
+      expect(err).toBeFalsy();
+    };
+    isAdmin(req, res, next);
+  });
+
+  test("isAdmin doesn't work: no user logged in", function () {
+    expect.assertions(1);
+    const req = {};
+    const res = { locals: {} };
+    const next = function (err) {
+      console.log("error type:", err instanceof UnauthorizedError);
+      expect(err instanceof UnauthorizedError).toBeTruthy();
+    };
+    isAdmin(req, res, next);
   });
 });
