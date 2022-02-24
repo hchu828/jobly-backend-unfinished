@@ -26,6 +26,7 @@ describe("sqlForPartialUpdate", function () {
     };
     try {
       const res = sqlForPartialUpdate(data, jsToSql);
+      fail();
     }
     catch (err) {
       expect(err instanceof BadRequestError).toBeTruthy();
@@ -33,7 +34,7 @@ describe("sqlForPartialUpdate", function () {
   });
 });
 
-
+//TODO: refactor
 describe("sqlForFilterByQuery", function () {
   test("works: single-key query", function () {
     const query = { name: "C1" };
@@ -46,7 +47,7 @@ describe("sqlForFilterByQuery", function () {
     const query = { minEmployees: 3 };
 
     const res = sqlForFilterByQuery(query);
-    expect(res).toEqual("num_employees >= 3'");
+    expect(res).toEqual("num_employees >= 3");
   });
 
   test("works: multi-key query", function () {

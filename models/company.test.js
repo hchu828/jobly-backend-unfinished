@@ -111,6 +111,7 @@ describe("get", function () {
   });
 });
 
+//TODO: refactor
 describe("filterByQuery", function () {
   test("works: filter by name", async function () {
     let company = await Company.filterByQuery({ name: "c1" });
@@ -125,10 +126,9 @@ describe("filterByQuery", function () {
 
   test("not found if no such company", async function () {
     try {
-      await Company.filterByQuery({name:"pickle"});
+      await Company.filterByQuery({ name: "pickle" });
       fail();
     } catch (err) {
-      console.log("ERROR:",err)
       expect(err instanceof NotFoundError).toBeTruthy();
     }
   });

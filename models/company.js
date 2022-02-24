@@ -85,9 +85,11 @@ class Company {
       FROM companies
       WHERE ${joinedWhereString}
       ORDER BY name`);
-    console.log("companiesRes:", companiesRes.rows);
 
-    if (companiesRes.rows.length === 0) throw new NotFoundError(`No company matching filter criteria`);
+    if (companiesRes.rows.length === 0) {
+      throw new NotFoundError(`No company matching filter criteria`);
+    }
+
     return companiesRes.rows;
   }
 

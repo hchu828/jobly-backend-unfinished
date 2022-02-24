@@ -7,7 +7,7 @@ const { BadRequestError } = require("../expressError");
  * Returns an object with 2 keys. setCols for column headers to be SET in the UPDATE
  * command. Values to be provided to the placeholders in the SQL statement
  */
-
+//TODO: // Provide example of return { setCols, values }
 function sqlForPartialUpdate(dataToUpdate, jsToSql) {
   const keys = Object.keys(dataToUpdate);
   if (keys.length === 0) throw new BadRequestError("No data");
@@ -28,31 +28,30 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
   };
 }
 
-
+/** Accepts an object containing URL query parameters that can ONLY include
+ * { name, minEmployees, maxEmployees } 
+ * 
+ * Returns SQL string literal for WHERE clause
+ * */
 function sqlForFilterByQuery(query) {
-  const whereString = [];
+  //TODO: sqlWhereParts
+  //TODO: SQL sanitation
+  //TODO: as Company method _sqlForFilterByQuery (used internally)
+  const sqlWhereString = [];
 
   if (query.name) {
-    whereString.push(`name ILIKE '%${query.name}%'`);
+    sqlWhereString.push(`name ILIKE '%${query.name}%'`);
   }
 
   if (query.minEmployees) {
-    whereString.push(`num_employees >= ${query.minEmployees}`);
+    sqlWhereString.push(`num_employees >= ${query.minEmployees}`);
   }
 
   if (query.maxEmployees) {
-    whereString.push(`num_employees <= ${query.maxEmployees}`);
+    sqlWhereString.push(`num_employees <= ${query.maxEmployees}`);
   }
 
-  console.log("whereString:", whereString);
-
-  const joinedWhereString = whereString.join(' AND ');
-
-
-  console.log("joinedWhereString:", joinedWhereString);
-
-  return joinedWhereString;
-
+  return sqlWhereString.join(' AND ');
 }
 
 module.exports = { sqlForPartialUpdate, sqlForFilterByQuery };

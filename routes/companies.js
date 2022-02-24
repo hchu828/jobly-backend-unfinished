@@ -49,36 +49,28 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  */
 
 router.get("/", async function (req, res, next) {
+  const result = jsonschema.validate(req.query, queryFilterSchema);
 
+  if (!result.valid) {
+    const errors = result.errors.map(err => err.stack);
+    throw new BadRequestError(errors);
+  }
 
   if (Object.values(req.query).length === 0) {
     const companies = await Company.findAll();
     return res.json({ companies });
   }
 
+  //TODO: should be handled by filterByQuery
   if (req.query.minEmployees > req.query.maxEmployees) {
     throw new BadRequestError(
       "Min Employees should be less than Max Employees filter"
     );
   }
 
-  const result = jsonschema.validate(req.query, queryFilterSchema);
-
-  console.log("RESULT.VALID", result.valid)
-  if (!result.valid) {
-    let errors = result.errors.map(err => err.stack);
-    throw new BadRequestError(errors);
-  }
-
   const companies = await Company.filterByQuery(req.query);
 
-  // Call the helpder passing the query values / array
-
-
   return res.json({ companies });
-
-
-
 });
 
 /** GET /[handle]  =>  { company }
