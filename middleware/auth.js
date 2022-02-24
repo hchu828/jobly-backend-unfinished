@@ -49,8 +49,21 @@ function ensureLoggedIn(req, res, next) {
 
 function isAdmin(req, res, next) {
   try {
-    console.log("isAdmin info", res.locals)
     if (res.locals.user.isAdmin !== true) throw new UnauthorizedError();
+    return next();
+  } catch (err) {
+    return next(err);
+  }
+}
+
+/** Middleware to use to validate if current user is a parameter in route
+ * 
+ * If not, raises Unauthorized
+ */
+
+function isCorrectUser(req, res, next) {
+  try {
+    if (req.params.username !== res.locals.user) throw new UnauthorizedError();
     return next();
   } catch (err) {
     return next(err);
@@ -62,4 +75,5 @@ module.exports = {
   authenticateJWT,
   ensureLoggedIn,
   isAdmin,
+  isCorrectUser,
 };
