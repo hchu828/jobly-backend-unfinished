@@ -2,7 +2,7 @@
 
 const db = require("../db");
 const { BadRequestError, NotFoundError } = require("../expressError");
-const { sqlForPartialUpdate, sqlForFilterByQuery } = require("../helpers/sql");
+const { sqlForPartialUpdate } = require("../helpers/sql");
 const { commonAfterAll } = require("./_testCommon");
 
 /** Related functions for companies. */
@@ -55,7 +55,7 @@ class Company {
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
    * */
 
-  static async findAll() {
+  static async findAll(queryParams) {
     const companiesRes = await db.query(
       `SELECT handle,
                 name,
@@ -63,8 +63,45 @@ class Company {
                 num_employees AS "numEmployees",
                 logo_url AS "logoUrl"
            FROM companies
+           ${undefined || queryParams}
            ORDER BY name`);
     return companiesRes.rows;
+  }
+
+  /** Accepts an object containing URL query parameters that can ONLY include
+ * { name, minEmployees, maxEmployees } 
+ * 
+ * Returns SQL string literal for WHERE clause
+ * */
+  static _sqlForFilterByQuery(query) {
+
+
+    if (query.minEmployees > query.maxEmployees) {
+      throw new BadRequestError(
+        "Min Employees should be less than Max Employees filter"
+      );
+    }
+
+    const queryKeys = Object.keys(query);
+
+    const sqlWhereParts = [];
+
+    if (query.name) {
+      sqlWhereParts.push(`name ILIKE '%$${queryKeys.indexOf("name") + 1}%'`);
+    }
+
+    if (query.minEmployees) {
+      sqlWhereParts.push(`num_employees >= $${queryKeys.indexOf("minEmployees") + 1}`);
+    }
+
+    if (query.maxEmployees) {
+      sqlWhereParts.push(`num_employees <= $${queryKeys.indexOf("maxEmployees") + 1}`);
+    }
+
+    return {
+      sqlWhere: sqlWhereParts.join(' AND '),
+      values: Object.values(query),
+    };
   }
 
   /** Find all companies by filter 
@@ -74,7 +111,7 @@ class Company {
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
   */
   static async filterByQuery(query) {
-    const joinedWhereString = sqlForFilterByQuery(query);
+    let { joinedWhereString, values } = _sqlForFilterByQuery(query);
 
     const companiesRes = await db.query(
       `SELECT handle,
@@ -84,7 +121,9 @@ class Company {
       logo_url AS "logoUrl"
       FROM companies
       WHERE ${joinedWhereString}
-      ORDER BY name`);
+      ORDER BY name`,
+      [...values]
+    );
 
     if (companiesRes.rows.length === 0) {
       throw new NotFoundError(`No company matching filter criteria`);

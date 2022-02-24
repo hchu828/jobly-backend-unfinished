@@ -28,30 +28,6 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
   };
 }
 
-/** Accepts an object containing URL query parameters that can ONLY include
- * { name, minEmployees, maxEmployees } 
- * 
- * Returns SQL string literal for WHERE clause
- * */
-function sqlForFilterByQuery(query) {
-  //TODO: sqlWhereParts
-  //TODO: SQL sanitation
-  //TODO: as Company method _sqlForFilterByQuery (used internally)
-  const sqlWhereString = [];
 
-  if (query.name) {
-    sqlWhereString.push(`name ILIKE '%${query.name}%'`);
-  }
 
-  if (query.minEmployees) {
-    sqlWhereString.push(`num_employees >= ${query.minEmployees}`);
-  }
-
-  if (query.maxEmployees) {
-    sqlWhereString.push(`num_employees <= ${query.maxEmployees}`);
-  }
-
-  return sqlWhereString.join(' AND ');
-}
-
-module.exports = { sqlForPartialUpdate, sqlForFilterByQuery };
+module.exports = { sqlForPartialUpdate };

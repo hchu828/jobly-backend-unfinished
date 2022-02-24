@@ -61,13 +61,6 @@ router.get("/", async function (req, res, next) {
     return res.json({ companies });
   }
 
-  //TODO: should be handled by filterByQuery
-  if (req.query.minEmployees > req.query.maxEmployees) {
-    throw new BadRequestError(
-      "Min Employees should be less than Max Employees filter"
-    );
-  }
-
   const companies = await Company.filterByQuery(req.query);
 
   return res.json({ companies });
