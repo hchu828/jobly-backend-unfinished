@@ -112,9 +112,9 @@ describe("get", function () {
 });
 
 //TODO: refactor
-describe("filterByQuery", function () {
+describe("findAll with filter by ", function () {
   test("works: filter by name", async function () {
-    let company = await Company.filterByQuery({ name: "c1" });
+    let company = await Company.findAll({name: 'c1'});
     expect(company[0]).toEqual({
       handle: "c1",
       name: "C1",
@@ -126,7 +126,7 @@ describe("filterByQuery", function () {
 
   test("not found if no such company", async function () {
     try {
-      await Company.filterByQuery({ name: "pickle" });
+      await Company.findAll({ name: "pickle" });
       fail();
     } catch (err) {
       expect(err instanceof NotFoundError).toBeTruthy();

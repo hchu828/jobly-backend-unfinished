@@ -55,13 +55,22 @@ class Company {
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
    * */
 
-  static async findAll(queryParams) {
-    //TODO: find a way to define whereString and values where needed
-    let { whereString, values } = (queryParams)
-      ? Company._sqlForFilterByQuery(queryParams)
-      : { undefined: undefined };
+  static async findAll(queryParams = {}) {
+
+    if (queryParams.minEmployees > queryParams.maxEmployees) {
+      throw new BadRequestError(
+        "Min Employees should be less than Max Employees filter"
+      );
+    }
+
+    const filterResp = Company._sqlForFilterByQuery(queryParams);
+    const whereString = filterResp.sqlWhere;
+    const values = filterResp.values;
 
 
+    console.log("WHERE STRING MAIN", whereString);
+    console.log("VALUES MAIN", values)
+    
     const companiesRes = await db.query(
       `SELECT handle,
                 name,
@@ -69,8 +78,9 @@ class Company {
                 num_employees AS "numEmployees",
                 logo_url AS "logoUrl"
            FROM companies
-           ${whereString || undefined}
-           ORDER BY name`, (undefined || [...values]));
+           ${whereString}
+           ORDER BY name`,
+           values);
     return companiesRes.rows;
   }
 
@@ -81,32 +91,38 @@ class Company {
  * */
   static _sqlForFilterByQuery(query) {
 
-    if (query.minEmployees > query.maxEmployees) {
-      throw new BadRequestError(
-        "Min Employees should be less than Max Employees filter"
-      );
-    }
-
-    const queryKeys = Object.keys(query);
+    const queryVals = []
 
     const sqlWhereParts = [];
 
     if (query.name) {
-      sqlWhereParts.push(`name ILIKE '%$${queryKeys.indexOf("name") + 1}%'`);
+      queryVals.push(`%${query["name"]}%`);
+      sqlWhereParts.push(`name ILIKE $${queryVals.length}`);
     }
 
     if (query.minEmployees) {
-      sqlWhereParts.push(`num_employees >= $${queryKeys.indexOf("minEmployees") + 1}`);
+      queryVals.push(query["minEmployees"]);
+      sqlWhereParts.push(`num_employees >= $${queryVals.length}`);
     }
 
     if (query.maxEmployees) {
-      sqlWhereParts.push(`num_employees <= $${queryKeys.indexOf("maxEmployees") + 1}`);
+      queryVals.push(query["maxEmployees"]);
+      sqlWhereParts.push(`num_employees <= $${queryVals.length}`);
     }
 
-    const whereClause = sqlWhereParts.join(' AND ');
+    // ternary: if whereparts greater than 0, do the same, otherwise, dont concat WHERE
+    // and instead return an empty string
+
+    const whereClause = (sqlWhereParts.length > 0)
+      ? 'WHERE ' + sqlWhereParts.join(' AND ')
+      : '';
+
+    console.log("WHERE CLAUSE INTERNAL", whereClause)
+    console.log("QUERY VALS INTERNAL", queryVals)
+
     return {
-      sqlWhere: 'WHERE ' + whereClause,
-      values: Object.values(query),
+      sqlWhere: whereClause,
+      values: queryVals,
     };
   }
 
