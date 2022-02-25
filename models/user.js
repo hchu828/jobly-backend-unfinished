@@ -14,6 +14,18 @@ const { BCRYPT_WORK_FACTOR } = require("../config.js");
 /** Related functions for users. */
 
 class User {
+
+  static async apply(username, jobId) {
+    const result = await db.query(
+      `INSERT INTO applications (username, job_id)
+      VALUES ($1, $2)
+      RETURNING username, job_id`,
+      [username, jobId],
+    );
+
+    return result.rows[0];
+  }
+
   /** authenticate user with username, password.
    *
    * Returns { username, first_name, last_name, email, is_admin }
@@ -24,7 +36,7 @@ class User {
   static async authenticate(username, password) {
     // try to find the user first
     const result = await db.query(
-          `SELECT username,
+      `SELECT username,
                   password,
                   first_name AS "firstName",
                   last_name AS "lastName",
@@ -32,7 +44,7 @@ class User {
                   is_admin AS "isAdmin"
            FROM users
            WHERE username = $1`,
-        [username],
+      [username],
     );
 
     const user = result.rows[0];
@@ -57,12 +69,12 @@ class User {
    **/
 
   static async register(
-      { username, password, firstName, lastName, email, isAdmin }) {
+    { username, password, firstName, lastName, email, isAdmin }) {
     const duplicateCheck = await db.query(
-          `SELECT username
+      `SELECT username
            FROM users
            WHERE username = $1`,
-        [username],
+      [username],
     );
 
     if (duplicateCheck.rows[0]) {
@@ -72,7 +84,7 @@ class User {
     const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
 
     const result = await db.query(
-          `INSERT INTO users
+      `INSERT INTO users
            (username,
             password,
             first_name,
@@ -81,14 +93,14 @@ class User {
             is_admin)
            VALUES ($1, $2, $3, $4, $5, $6)
            RETURNING username, first_name AS "firstName", last_name AS "lastName", email, is_admin AS "isAdmin"`,
-        [
-          username,
-          hashedPassword,
-          firstName,
-          lastName,
-          email,
-          isAdmin,
-        ],
+      [
+        username,
+        hashedPassword,
+        firstName,
+        lastName,
+        email,
+        isAdmin,
+      ],
     );
 
     const user = result.rows[0];
@@ -101,16 +113,34 @@ class User {
    * Returns [{ username, first_name, last_name, email, is_admin }, ...]
    **/
 
+  //TODO: finish this later
+
   static async findAll() {
     const result = await db.query(
-          `SELECT username,
-                  first_name AS "firstName",
-                  last_name AS "lastName",
-                  email,
-                  is_admin AS "isAdmin"
+      `SELECT u.username,
+              u.first_name AS "firstName",
+              u.last_name AS "lastName",
+              u.email,
+              u.is_admin AS "isAdmin",
+              j.job_id AS "jobId"
            FROM users
+           JOIN applications AS j 
+            ON u.username = j.username
+          
            ORDER BY username`,
     );
+
+    const users = result.rows;
+
+    const applicationsRes = await db.query(
+      `SELECT job_id AS "jobId
+      FROM users 
+      JOIN applications
+        ON users.username = applications.username`
+    );
+
+    const jobs = applicationRes.results.map(j => ({ jobId }));
+    result[jobs] = jobs;
 
     return result.rows;
   }
@@ -125,14 +155,14 @@ class User {
 
   static async get(username) {
     const userRes = await db.query(
-          `SELECT username,
+      `SELECT username,
                   first_name AS "firstName",
                   last_name AS "lastName",
                   email,
                   is_admin AS "isAdmin"
            FROM users
            WHERE username = $1`,
-        [username],
+      [username],
     );
 
     const user = userRes.rows[0];
@@ -165,12 +195,12 @@ class User {
     }
 
     const { setCols, values } = sqlForPartialUpdate(
-        data,
-        {
-          firstName: "first_name",
-          lastName: "last_name",
-          isAdmin: "is_admin",
-        });
+      data,
+      {
+        firstName: "first_name",
+        lastName: "last_name",
+        isAdmin: "is_admin",
+      });
     const usernameVarIdx = "$" + (values.length + 1);
 
     const querySql = `UPDATE users 
@@ -194,11 +224,11 @@ class User {
 
   static async remove(username) {
     let result = await db.query(
-          `DELETE
+      `DELETE
            FROM users
            WHERE username = $1
            RETURNING username`,
-        [username],
+      [username],
     );
     const user = result.rows[0];
 

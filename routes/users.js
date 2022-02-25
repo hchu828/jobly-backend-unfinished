@@ -40,16 +40,16 @@ router.post("/", ensureLoggedIn, isAdmin, async function (req, res, next) {
   return res.status(201).json({ user, token });
 });
 
-outer.post("/:username/jobs/:id",
+router.post("/:username/jobs/:id",
   ensureLoggedIn,
   isCorrectUserOrIsAdmin,
   async function (req, res, next) {
     const { username, jobId } = req.params;
-
+    const application = await User.apply(username, jobId);
     // TODO: need application method
 
 
-    return res.json({applied: jobId})
+    return res.json({ applied: jobId })
   })
 
 
