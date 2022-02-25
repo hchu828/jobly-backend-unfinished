@@ -41,8 +41,6 @@ describe("POST /companies", function () {
     });
   });
 
-  // TODO: ask instructor if this style of test is necessary if we handle admin
-  // auth test at the lowest level
   test("not ok for non-admin users", async function () {
     const resp = await request(app)
       .post("/companies")
@@ -239,6 +237,7 @@ describe("PATCH /companies/:handle", function () {
     expect(resp.statusCode).toEqual(401);
   });
 
+  // TODO: CR No such company with admin token distinction
   test("not found on no such company", async function () {
     const resp = await request(app)
       .patch(`/companies/nope`)
@@ -293,6 +292,7 @@ describe("DELETE /companies/:handle", function () {
     expect(resp.statusCode).toEqual(401);
   });
 
+  //TODO: Admin vs non admin for non existant
   test("not found for no such company", async function () {
     const resp = await request(app)
       .delete(`/companies/nope`)

@@ -56,14 +56,39 @@ function isAdmin(req, res, next) {
   }
 }
 
+// This is commented out for now since currentUser is not required at the moment
 /** Middleware to use to validate if current user is a parameter in route
  * 
  * If not, raises Unauthorized
  */
 
-function isCorrectUser(req, res, next) {
+// function isCorrectUser(req, res, next) {
+//   try {
+//     if (req.params.username !== res.locals.user) throw new UnauthorizedError();
+//     return next();
+//   } catch (err) {
+//     return next(err);
+//   }
+// }
+
+
+// TODO: Ask if we can nest middleware
+
+/** Middleware used to validate if current user is a parameter in route
+ * OR if have isAdmin : true
+ * 
+ * If not, raises Unauthorized
+ */
+
+function isCorrectUserOrIsAdmin(req, res, next) {
   try {
-    if (req.params.username !== res.locals.user) throw new UnauthorizedError();
+    if (
+      res.locals.user.isAdmin !== true &&
+      req.params.username !== res.locals.user.username
+    ) {
+      throw new UnauthorizedError();
+    }
+
     return next();
   } catch (err) {
     return next(err);
@@ -75,5 +100,5 @@ module.exports = {
   authenticateJWT,
   ensureLoggedIn,
   isAdmin,
-  isCorrectUser,
+  isCorrectUserOrIsAdmin
 };
