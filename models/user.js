@@ -121,26 +121,26 @@ class User {
               u.first_name AS "firstName",
               u.last_name AS "lastName",
               u.email,
-              u.is_admin AS "isAdmin",
-              j.job_id AS "jobId"
-           FROM users
-           JOIN applications AS j 
-            ON u.username = j.username
-          
+              u.is_admin AS "isAdmin", 
+           FROM users       
            ORDER BY username`,
     );
 
-    const users = result.rows;
+    // j.job_id AS "jobId"
+    //   JOIN applications AS j 
+    //ON u.username = j.username
 
-    const applicationsRes = await db.query(
-      `SELECT job_id AS "jobId
-      FROM users 
-      JOIN applications
-        ON users.username = applications.username`
-    );
+    // const users = result.rows;
 
-    const jobs = applicationRes.results.map(j => ({ jobId }));
-    result[jobs] = jobs;
+    // const applicationsRes = await db.query(
+    //   `SELECT job_id AS "jobId
+    //   FROM users 
+    //   JOIN applications
+    //     ON users.username = applications.username`
+    // );
+
+    // const jobs = applicationRes.results.map(j => ({ jobId }));
+    // result[jobs] = jobs;
 
     return result.rows;
   }
