@@ -3,15 +3,15 @@
 /** Routes for jobs. */
 
 const jsonschema = require("jsonschema");
-// TODO: const queryFilterSchema = require("../schemas/queryFilter.json");
+const queryFilterSchema = require("../schemas/jobFilter.json");
 const express = require("express");
 
 const { BadRequestError } = require("../expressError");
 const { ensureLoggedIn, isAdmin } = require("../middleware/auth");
 const Job = require("../models/job");
 
-// TODO: const companyNewSchema = require("../schemas/companyNew.json");
-// TODO: const companyUpdateSchema = require("../schemas/companyUpdate.json");
+const jobNewSchema = require("../schemas/jobNew.json");
+const jobUpdateSchema = require("../schemas/jobUpdate.json");
 
 const router = new express.Router();
 

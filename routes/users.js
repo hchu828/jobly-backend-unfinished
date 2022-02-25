@@ -40,6 +40,18 @@ router.post("/", ensureLoggedIn, isAdmin, async function (req, res, next) {
   return res.status(201).json({ user, token });
 });
 
+outer.post("/:username/jobs/:id",
+  ensureLoggedIn,
+  isCorrectUserOrIsAdmin,
+  async function (req, res, next) {
+    const { username, jobId } = req.params;
+
+    // TODO: need application method
+
+
+    return res.json({applied: jobId})
+  })
+
 
 /** GET / => { users: [ {username, firstName, lastName, email }, ... ] }
  *

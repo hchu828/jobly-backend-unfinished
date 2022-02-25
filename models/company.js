@@ -147,8 +147,26 @@ class Company {
       [handle]);
 
     const company = companyRes.rows[0];
-
     if (!company) throw new NotFoundError(`No company: ${handle}`);
+
+    const jobRes = await db.query(
+      `SELECT id,
+                title,
+                salary,
+                equity,
+                company_handle AS "companyHandle"
+           FROM jobs
+           WHERE company_handle = $1`,
+    )
+
+    const jobs = jobRes.rows.map(r => ({
+      title: r.title,
+      salary: r.salary,
+      equity: r.equity,
+      companyHandle: r.companyHandle,
+    }))
+
+    company[jobs] = jobs;
 
     return company;
   }
